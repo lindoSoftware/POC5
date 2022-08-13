@@ -2,8 +2,13 @@ package com.demo.poc5;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Scanner;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Poc5 {
@@ -33,16 +38,80 @@ public class Poc5 {
 
 //Conversion string a objeto
                 JSONObject jsonObject = new JSONObject(info.toString());
-//Impresion de array Departments
-                JSONArray departments = jsonObject.getJSONArray("Departments");
-                for (int i = 0; i < departments.length(); i++) {
-                    departments.getJSONObject(i);
-                    System.out.println(departments.getJSONObject(i));
+
+//Creacion de lista a ordenar
+                JSONArray jsonDepartments = jsonObject.getJSONArray("Departments");
+                JSONArray sortedDepartments = new JSONArray();
+                List<JSONObject> departmentsList = new ArrayList<>();
+
+                for (int i = 0; i < jsonDepartments.length(); i++) {
+                    departmentsList.add(jsonDepartments.getJSONObject(i));
                 }
+
+//Orden de lista creada por quantity
+                Collections.sort(departmentsList, new Comparator<JSONObject>() {
+
+                    @Override
+                    public int compare(JSONObject a, JSONObject b) {
+                        int valA = a.getInt("Quantity");
+                        int valB = b.getInt("Quantity");
+
+                        if (valA > valB) {
+                            return 1;
+                        }
+                        if (valA < valB) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                });
+
+//Insercion en lista ordenada
+                for (int i = 0; i < jsonDepartments.length(); i++) {
+                    sortedDepartments.put(departmentsList.get(i));
+                }
+//Impresion de lista ordenada
+                System.out.println("Lista Departments en orden ascendente por Quantity: " + sortedDepartments.toString());
+
+//Creacion de lista a ordenar
+                JSONArray jsonBrands = jsonObject.getJSONArray("Brands");
+                JSONArray sortedBrands = new JSONArray();
+                List<JSONObject> brandsList = new ArrayList<>();
+
+                for (int i = 0; i < jsonBrands.length(); i++) {
+                    brandsList.add(jsonBrands.getJSONObject(i));
+                }
+
+//Orden de lista creada por name
+                Collections.sort(brandsList, new Comparator<JSONObject>() {
+
+                    @Override
+                    public int compare(JSONObject a, JSONObject b) {
+                        String valA = new String();
+                        String valB = new String();
+
+                        try {
+                            valA = (String) a.get("Name");
+                            valB = (String) b.get("Name");
+                        } catch (JSONException e) {
+
+                        }
+
+                        return -valA.compareTo(valB);
+                    }
+                });
+//Insercion en lista ordenada
+                for (int i = 0; i < jsonBrands.length(); i++) {
+                    sortedBrands.put(brandsList.get(i));
+                }
+//Impresion de lista ordenada
+                System.out.println("Lista Brands en orden descendente por Name: " + sortedBrands.toString());
+
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }
